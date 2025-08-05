@@ -373,7 +373,7 @@ st.markdown("""
 # Header principal mejorado
 st.markdown("""
 <div class="header-container">
-    <div class="titulo-principal">🤟 TLS-UNAH</div>
+    <div class="titulo-principal">TLS-UNAH</div>
     <div class="subtitulo-proyecto">Traductor de Lenguaje de Señas Hondureño</div>
     <div class="descripcion-proyecto">Tecnología de reconocimiento de señas con IA avanzada</div>
 </div>
@@ -383,7 +383,7 @@ st.markdown("""
 with st.expander("📋 Guía de Uso - Instrucciones Detalladas"):
     st.markdown("""
     <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); padding: 1.5rem; border-radius: 12px; color: white; margin-bottom: 1rem;">
-        <h3 style="margin-top: 0; color: white;">🎯 ¿Cómo usar la aplicación?</h3>
+        <h3 style="margin-top: 0; color: white;">¿Cómo usar la aplicación?</h3>
     </div>
     
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; margin-top: 1rem;">
@@ -399,13 +399,6 @@ with st.expander("📋 Guía de Uso - Instrucciones Detalladas"):
             <p>• Carga un video con señas</p>
             <p>• Procesamiento fotograma por fotograma</p>
             <p>• Transcripción automática completa</p>
-        </div>
-        
-        <div style="background: linear-gradient(135deg, #2ECC71 0%, #27AE60 100%); padding: 1.5rem; border-radius: 12px; color: white;">
-            <h4 style="color: white; margin-top: 0;">📹 Cámara en Vivo</h4>
-            <p>• Detección en tiempo real</p>
-            <p>• Funciona mejor en local</p>
-            <p>• Transcripción instantánea</p>
         </div>
     </div>
     
