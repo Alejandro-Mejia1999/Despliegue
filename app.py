@@ -550,8 +550,8 @@ with col1:
     with st.container(border=True):
         st.markdown("""
         <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-                    padding: 1rem; border-radius: 8px; color: white; margin-bottom: 1rem; text-align: center;">
-            <h4 style="margin: 0; color: black;">🎮 Selecciona el Modo de Entrada</h4>
+                    padding: 1rem; border-radius: 8px; color: black; margin-bottom: 1rem; text-align: center;">
+            <h4 style="margin: 0; color: white;">🎮 Selecciona el Modo de Entrada</h4>
         </div>
         """, unsafe_allow_html=True)
         
@@ -566,7 +566,7 @@ with col1:
             st.markdown("""
             <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); 
                         padding: 1rem; border-radius: 8px; color: white; margin: 1rem 0; text-align: center;">
-                <h5 style="margin: 0; color: black;">📸 Modo Imagen Activado</h5>
+                <h5 style="margin: 0; color: white;">📸 Modo Imagen Activado</h5>
             </div>
             """, unsafe_allow_html=True)
             
