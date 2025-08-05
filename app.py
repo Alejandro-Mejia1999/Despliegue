@@ -10,6 +10,39 @@ import time
 # Configuración de la página
 st.set_page_config(page_title="TLS'UNAH - Traductor de Lenguaje de Señas", layout="wide")
 
+# --- NUEVOS ELEMENTOS DE DISEÑO ---
+# Título personalizado con CSS
+st.markdown("""
+<style>
+.titulo-principal {
+    font-size: 3em;
+    font-weight: bold;
+    color: #2ECC71; /* Color verde lima */
+    text-align: center;
+    margin-bottom: 20px;
+}
+.subtitulo-proyecto {
+    font-size: 1.2em;
+    text-align: center;
+    color: #a0a0a0;
+}
+</style>
+<div class="titulo-principal">TLS-UNAH: Traductor de Lenguaje de Señas</div>
+<div class="subtitulo-proyecto">Proyecto de reconocimiento de lenguaje de señas</div>
+""", unsafe_allow_html=True)
+
+# Expansor para las instrucciones, manteniendo la interfaz limpia
+with st.expander("📝 Instrucciones de Uso"):
+    st.markdown("""
+        Esta aplicación traduce señas del lenguaje de señas hondureño a texto. Puedes usarla de las siguientes maneras:
+        - **Imagen:** Sube una imagen de una seña para que sea detectada y transcrita.
+        - **Video:** Sube un video y la aplicación procesará cada fotograma para transcribir las señas detectadas.
+        - **Cámara en vivo:** Usa la cámara de tu dispositivo para la detección en tiempo real.
+        
+        **Importante:** La cámara en vivo solo funciona si ejecutas la aplicación en tu máquina local.
+    """)
+# ------------------------------------
+
 # Cargar el modelo (con manejo de errores)
 @st.cache_resource
 def load_model():
@@ -78,20 +111,15 @@ if 'camera_active' not in st.session_state:
 if 'cap' not in st.session_state:
     st.session_state.cap = None
 
-# Interfaz de usuario
-st.title("TLS-UNAH: Traductor de Lenguaje de Señas")
+# Usar columnas con proporciones fijas (por ejemplo, 40/60)
+col1, col2 = st.columns([4, 6])
 
-# Usar columnas con proporciones fijas
-col1, col2 = st.columns([5, 5])
-
-# Área de transcripción - Solución definitiva sin claves duplicadas
+# Área de transcripción
 with col2:
     st.header("Transcripción")
     
-    # Usamos un contenedor vacío que actualizaremos
     transcription_display = st.empty()
     
-    # Función para mostrar la transcripción usando markdown
     def show_transcription():
         transcription_display.markdown(
             f"""
@@ -100,7 +128,7 @@ with col2:
                 padding: 10px;
                 height: 300px;
                 overflow-y: auto;
-                background-color: #808080;
+                background-color: #333333; /* Color de fondo un poco más oscuro */
                 border-radius: 5px;
                 white-space: pre-wrap;
             ">{st.session_state.transcription}</div>
@@ -108,7 +136,6 @@ with col2:
             unsafe_allow_html=True
         )
     
-    # Mostrar la transcripción inicial
     show_transcription()
     
     if st.button("Limpiar transcripción", key="clear_button"):
@@ -116,134 +143,139 @@ with col2:
         st.session_state.last_char = ""
         show_transcription()
 
+# Sección de entrada
 with col1:
     st.header("Entrada")
-    option = st.radio("Seleccione el tipo de entrada:", 
-                     ('Imagen', 'Video', 'Cámara en vivo'), key="input_type")
+    
+    # --- AGRUPACIÓN CON CONTENEDOR ---
+    with st.container(border=True):
+        option = st.radio("Seleccione el tipo de entrada:", 
+                         ('Imagen', 'Video', 'Cámara en vivo'), key="input_type")
 
-    if option == 'Imagen':
-        uploaded_file = st.file_uploader("Subir imagen", type=['png', 'jpg', 'jpeg'], key="image_uploader")
-        if uploaded_file is not None:
-            image = Image.open(uploaded_file)
-            image = image.resize((280, 280))
-            image_with_box = dibujar_recuadro_deteccion(image.copy())
-            
-            st.image(image_with_box, caption='Imagen cargada', use_container_width=True)
-            
-            with st.spinner('Procesando imagen...'):
-                prediccion, confianza = procesar_sena(np.array(image.resize((224, 224))))
-            
-            if prediccion:
-                st.success(f"Letra detectada: {prediccion} (Confianza: {confianza:.2%})")
-                if prediccion != st.session_state.last_char:
-                    st.session_state.transcription += prediccion + " "
-                    st.session_state.last_char = prediccion
-                    show_transcription()
-            else:
-                st.warning("No se detectó una seña clara en la imagen")
+        if option == 'Imagen':
+            uploaded_file = st.file_uploader("Subir imagen", type=['png', 'jpg', 'jpeg'], key="image_uploader")
+            if uploaded_file is not None:
+                image = Image.open(uploaded_file)
+                image = image.resize((280, 280))
+                image_with_box = dibujar_recuadro_deteccion(image.copy())
+                
+                st.image(image_with_box, caption='Imagen cargada', use_container_width=True)
+                
+                with st.spinner('Procesando imagen...'):
+                    prediccion, confianza = procesar_sena(np.array(image.resize((224, 224))))
+                
+                if prediccion:
+                    st.success(f"Letra detectada: {prediccion} (Confianza: {confianza:.2%})")
+                    if prediccion != st.session_state.last_char:
+                        st.session_state.transcription += prediccion + " "
+                        st.session_state.last_char = prediccion
+                        show_transcription()
+                else:
+                    st.warning("No se detectó una seña clara en la imagen")
 
-    elif option == 'Video':
-        uploaded_file = st.file_uploader("Subir video", type=['mp4', 'avi', 'mov'], key="video_uploader")
-        if uploaded_file is not None:
-            tfile = tempfile.NamedTemporaryFile(delete=False) 
-            tfile.write(uploaded_file.read())
-            tfile.close()
-            
-            cap = cv2.VideoCapture(tfile.name)
-            stframe = st.empty()
-            
-            # Reiniciar transcripción
-            st.session_state.transcription = ""
-            st.session_state.last_char = ""
-            show_transcription()
-            
-            stop_button = st.button('Detener procesamiento', key="stop_video")
-            fps = cap.get(cv2.CAP_PROP_FPS)
-            frame_delay = 1.0 / fps if fps > 0 else 0.03
-            
-            while cap.isOpened() and not stop_button:
-                start_time = time.time()
+        elif option == 'Video':
+            uploaded_file = st.file_uploader("Subir video", type=['mp4', 'avi', 'mov'], key="video_uploader")
+            if uploaded_file is not None:
+                tfile = tempfile.NamedTemporaryFile(delete=False) 
+                tfile.write(uploaded_file.read())
+                tfile.close()
                 
-                ret, frame = cap.read()
-                if not ret:
-                    break
+                cap = cv2.VideoCapture(tfile.name)
+                stframe = st.empty()
                 
-                frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                frame_display = cv2.resize(frame_rgb, (280, 280))
-                img_pil = Image.fromarray(frame_display)
-                img_with_box = dibujar_recuadro_deteccion(img_pil)
-                
-                stframe.image(img_with_box, caption='Procesando video...', use_container_width=True)
-                
-                frame_for_model = cv2.resize(frame_rgb, (224, 224))
-                prediccion, _ = procesar_sena(frame_for_model)
-                
-                if prediccion and prediccion != st.session_state.last_char:
-                    st.session_state.transcription += prediccion + " "
-                    st.session_state.last_char = prediccion
-                    show_transcription()
-                
-                processing_time = time.time() - start_time
-                sleep_time = max(0, frame_delay - processing_time)
-                time.sleep(sleep_time)
-            
-            cap.release()
-            os.unlink(tfile.name)
-
-    elif option == 'Cámara en vivo':
-        st.warning("La cámara en vivo requiere acceso al hardware. Esta función funciona mejor cuando la aplicación se ejecuta localmente.")
-        
-        if st.button('Iniciar/Detener Cámara', key="toggle_camera"):
-            st.session_state.camera_active = not st.session_state.camera_active
-            if st.session_state.camera_active:
-                st.session_state.cap = cv2.VideoCapture(0)
                 st.session_state.transcription = ""
                 st.session_state.last_char = ""
                 show_transcription()
-            else:
-                if st.session_state.cap is not None:
-                    st.session_state.cap.release()
-                    st.session_state.cap = None
-        
-        if st.session_state.camera_active and st.session_state.cap is not None:
-            FRAME_WINDOW = st.empty()
-            stop_button = st.button('Detener Procesamiento', key="stop_camera")
-            
-            while st.session_state.camera_active and not stop_button and st.session_state.cap is not None:
-                start_time = time.time()
                 
-                ret, frame = st.session_state.cap.read()
-                if not ret:
-                    st.error("Error al capturar frame de la cámara")
-                    break
+                stop_button = st.button('Detener procesamiento', key="stop_video")
+                fps = cap.get(cv2.CAP_PROP_FPS)
+                frame_delay = 1.0 / fps if fps > 0 else 0.03
+                
+                while cap.isOpened() and not stop_button:
+                    start_time = time.time()
                     
-                frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                frame_display = cv2.resize(frame_rgb, (280, 280))
-                img_pil = Image.fromarray(frame_display)
-                img_with_box = dibujar_recuadro_deteccion(img_pil)
+                    ret, frame = cap.read()
+                    if not ret:
+                        break
+                    
+                    frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                    frame_display = cv2.resize(frame_rgb, (280, 280))
+                    img_pil = Image.fromarray(frame_display)
+                    img_with_box = dibujar_recuadro_deteccion(img_pil)
+                    
+                    stframe.image(img_with_box, caption='Procesando video...', use_container_width=True)
+                    
+                    frame_for_model = cv2.resize(frame_rgb, (224, 224))
+                    prediccion, _ = procesar_sena(frame_for_model)
+                    
+                    if prediccion and prediccion != st.session_state.last_char:
+                        st.session_state.transcription += prediccion + " "
+                        st.session_state.last_char = prediccion
+                        show_transcription()
+                    
+                    processing_time = time.time() - start_time
+                    sleep_time = max(0, frame_delay - processing_time)
+                    time.sleep(sleep_time)
                 
-                FRAME_WINDOW.image(img_with_box, use_container_width=True)
-                
-                frame_for_model = cv2.resize(frame_rgb, (224, 224))
-                prediccion, _ = procesar_sena(frame_for_model)
-                
-                if prediccion and prediccion != st.session_state.last_char:
-                    st.session_state.transcription += prediccion + " "
-                    st.session_state.last_char = prediccion
-                    show_transcription()
-                
-                processing_time = time.time() - start_time
-                time.sleep(max(0, 0.1 - processing_time))
+                cap.release()
+                os.unlink(tfile.name)
+
+        elif option == 'Cámara en vivo':
+            st.warning("La cámara en vivo requiere acceso al hardware. Esta función funciona mejor cuando la aplicación se ejecuta localmente.")
             
-            if stop_button:
-                st.session_state.camera_active = False
-                if st.session_state.cap is not None:
-                    st.session_state.cap.release()
-                    st.session_state.cap = None
+            if st.button('Iniciar/Detener Cámara', key="toggle_camera"):
+                st.session_state.camera_active = not st.session_state.camera_active
+                if st.session_state.camera_active:
+                    st.session_state.cap = cv2.VideoCapture(0)
+                    st.session_state.transcription = ""
+                    st.session_state.last_char = ""
+                    show_transcription()
+                else:
+                    if st.session_state.cap is not None:
+                        st.session_state.cap.release()
+                        st.session_state.cap = None
+            
+            if st.session_state.camera_active and st.session_state.cap is not None:
+                FRAME_WINDOW = st.empty()
+                stop_button = st.button('Detener Procesamiento', key="stop_camera")
+                
+                while st.session_state.camera_active and not stop_button and st.session_state.cap is not None:
+                    start_time = time.time()
+                    
+                    ret, frame = st.session_state.cap.read()
+                    if not ret:
+                        st.error("Error al capturar frame de la cámara")
+                        break
+                        
+                    frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                    frame_display = cv2.resize(frame_rgb, (280, 280))
+                    img_pil = Image.fromarray(frame_display)
+                    img_with_box = dibujar_recuadro_deteccion(img_pil)
+                    
+                    FRAME_WINDOW.image(img_with_box, use_container_width=True)
+                    
+                    frame_for_model = cv2.resize(frame_rgb, (224, 224))
+                    prediccion, _ = procesar_sena(frame_for_model)
+                    
+                    if prediccion and prediccion != st.session_state.last_char:
+                        st.session_state.transcription += prediccion + " "
+                        st.session_state.last_char = prediccion
+                        show_transcription()
+                    
+                    processing_time = time.time() - start_time
+                    time.sleep(max(0, 0.1 - processing_time))
+                
+                if stop_button:
+                    st.session_state.camera_active = False
+                    if st.session_state.cap is not None:
+                        st.session_state.cap.release()
+                        st.session_state.cap = None
+    # ------------------------------------
 
 # Notas al pie
 st.markdown("---")
-st.markdown("### TLS UNAH-IS - Proyecto de reconocimiento de lenguaje de señas")
+st.markdown("<p style='text-align: center; color: #808080;'>© 2024 TLS UNAH-IS. Todos los derechos reservados.</p>", unsafe_allow_html=True)
+
 
 # Limpieza al cerrar
 def cleanup():
