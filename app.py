@@ -149,7 +149,7 @@ st.markdown("""
     }
     
     .streamlit-expanderContent {
-        background: linear-gradient(90deg, #667eea, #764ba2);
+        background: white;
         border-radius: 0 0 var(--border-radius) var(--border-radius);
         border: 1px solid #e0e0e0;
         border-top: none;
