@@ -409,7 +409,7 @@ with st.expander("📋 Guía de Uso - Instrucciones Detalladas"):
     </div>
     
     <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; margin-top: 1rem; border-left: 4px solid #3498DB;">
-        <strong>💡 Consejos para mejores resultados:</strong><br>
+        <strong style="background: #131517;>💡 Consejos para mejores resultados:</strong><br>
         • Usa buena iluminación<br>
         • Mantén la mano centrada en el recuadro<br>
         • Evita fondos complejos<br>
@@ -582,7 +582,7 @@ with col1:
                 image = image.resize((280, 280))
                 image_with_box = dibujar_recuadro_deteccion(image.copy())
                 
-                st.image(image_with_box, caption='🖼️ Imagen cargada - Lista para análisis', use_container_width=True)
+                st.image(image_with_box, caption='Imagen cargada - Lista para análisis', use_container_width=True)
                 
                 with st.spinner('🔍 Analizando imagen con IA...'):
                     time.sleep(1)  # Simular procesamiento
@@ -592,8 +592,8 @@ with col1:
                     # Mostrar resultado con estilo mejorado
                     st.markdown(f"""
                     <div class="confidence-indicator">
-                        ✅ Letra detectada: <strong>{prediccion}</strong> | 
-                        🎯 Confianza: <strong>{confianza:.1%}</strong>
+                         Letra detectada: <strong>{prediccion}</strong> | 
+                        Confianza: <strong>{confianza:.1%}</strong>
                     </div>
                     """, unsafe_allow_html=True)
                     
@@ -637,7 +637,7 @@ with col1:
                 fps = cap.get(cv2.CAP_PROP_FPS)
                 duration = total_frames / fps if fps > 0 else 0
                 
-                st.info(f"📊 Video cargado: {total_frames} frames, {fps:.1f} FPS, {duration:.1f}s de duración")
+                st.info(f" Video cargado: {total_frames} frames, {fps:.1f} FPS, {duration:.1f}s de duración")
                 
                 progress_bar = st.progress(0)
                 stop_button = st.button('⏹️ Detener Procesamiento', key="stop_video")
@@ -700,10 +700,10 @@ with col1:
                     st.session_state.transcription = ""
                     st.session_state.last_char = ""
                     show_transcription()
-                    st.success("✅ Cámara iniciada")
+                    st.success(" Cámara iniciada")
             
             with col_cam2:
-                if st.button('⏹️ Detener Cámara', key="stop_camera", use_container_width=True):
+                if st.button('Detener Cámara', key="stop_camera", use_container_width=True):
                     st.session_state.camera_active = False
                     if st.session_state.cap is not None:
                         st.session_state.cap.release()
@@ -743,7 +743,7 @@ with col1:
                         status_placeholder.markdown(f"""
                         <div style="background: linear-gradient(135deg, #2ECC71 0%, #27AE60 100%); 
                                     padding: 0.5rem; border-radius: 8px; color: white; text-align: center; margin: 0.5rem 0;">
-                            🎯 Detectado: <strong>{prediccion}</strong> ({confianza:.1%})
+                             Detectado: <strong>{prediccion}</strong> ({confianza:.1%})
                         </div>
                         """, unsafe_allow_html=True)
                     
@@ -765,7 +765,7 @@ st.markdown("""
         </div>
         <div style="border-left: 2px solid rgba(255,255,255,0.3); padding-left: 2rem;">
             <p style="margin: 0; opacity: 0.8;">© 2024 Todos los derechos reservados</p>
-            <p style="margin: 0.5rem 0 0 0; opacity: 0.6;">Desarrollado con ❤️ y tecnología IA</p>
+            <p style="margin: 0.5rem 0 0 0; opacity: 0.6;">Desarrollado en IS-701</p>
         </div>
     </div>
 </div>
