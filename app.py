@@ -400,6 +400,12 @@ with st.expander("📋 Guía de Uso - Instrucciones Detalladas"):
             <p>• Procesamiento fotograma por fotograma</p>
             <p>• Transcripción automática completa</p>
         </div>
+        <div style="background: linear-gradient(135deg, #2ECC71 0%, #27AE60 100%); padding: 1.5rem; border-radius: 12px; color: white;">
+            <h4 style="color: white; margin-top: 0;">📹 Cámara en Vivo</h4>
+            <p>• Detección en tiempo real</p>
+            <p>• Funciona mejor en local</p>
+            <p>• Transcripción instantánea</p>
+        </div>
     </div>
     
     <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; margin-top: 1rem; border-left: 4px solid #3498DB;">
@@ -415,7 +421,7 @@ with st.expander("📋 Guía de Uso - Instrucciones Detalladas"):
 @st.cache_resource
 def load_model():
     try:
-        with st.spinner('🤖 Cargando modelo de IA...'):
+        with st.spinner('Cargando modelo de IA...'):
             # Solución especial para el error de InputLayer
             custom_objects = {
                 'InputLayer': lambda **kwargs: tf.keras.layers.InputLayer(
@@ -430,7 +436,7 @@ def load_model():
                 custom_objects=custom_objects,
                 compile=False
             )
-            st.success("✅ Modelo cargado exitosamente")
+            st.success("Modelo cargado exitosamente")
             return modelo
     except Exception as e:
         st.error(f"❌ Error crítico al cargar el modelo: {str(e)}")
@@ -504,7 +510,7 @@ with col2:
             <div class="transcription-area">
                 <div style="padding-top: 2rem;">
                     <div style="font-size: 0.9em; opacity: 0.8; margin-bottom: 1rem;">
-                        📊 Total de letras detectadas: {len(letters)}
+                        Total de letras detectadas: {len(letters)}
                     </div>
                     <div style="font-size: 1.3em; line-height: 2; word-spacing: 10px;">
                         {' '.join([f'<span style="background: rgba(255,255,255,0.2); padding: 5px 10px; border-radius: 8px; margin: 2px; display: inline-block; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">{letter}</span>' for letter in letters if letter])}
@@ -516,7 +522,7 @@ with col2:
             transcription_html = """
             <div class="transcription-area">
                 <div class="transcription-placeholder">
-                    <div class="emoji">🤟</div>
+                    <div class="emoji"></div>
                     <div style="font-size: 1.1em; font-weight: 500;">Esperando detección de señas...</div>
                     <div style="font-size: 0.9em; opacity: 0.7; margin-top: 0.5rem;">Las letras aparecerán aquí automáticamente</div>
                 </div>
@@ -538,14 +544,14 @@ with col2:
 
 # Sección de entrada mejorada
 with col1:
-    st.markdown('<div class="section-header">🎯 Panel de Control</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-header"> Panel de Control</div>', unsafe_allow_html=True)
     
     # Contenedor con borde mejorado
     with st.container(border=True):
         st.markdown("""
         <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
                     padding: 1rem; border-radius: 8px; color: white; margin-bottom: 1rem; text-align: center;">
-            <h4 style="margin: 0; color: white;">🎮 Selecciona el Modo de Entrada</h4>
+            <h4 style="margin: 0; color: black;">🎮 Selecciona el Modo de Entrada</h4>
         </div>
         """, unsafe_allow_html=True)
         
@@ -560,7 +566,7 @@ with col1:
             st.markdown("""
             <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); 
                         padding: 1rem; border-radius: 8px; color: white; margin: 1rem 0; text-align: center;">
-                <h5 style="margin: 0; color: white;">📸 Modo Imagen Activado</h5>
+                <h5 style="margin: 0; color: black;">📸 Modo Imagen Activado</h5>
             </div>
             """, unsafe_allow_html=True)
             
